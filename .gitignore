@@ -127,9 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+rnab-qtl/.DS_Store
 rnab-qtl/Untitled.ipynb
 rnab-qtl/pm_gend_nbs/*
+atac-qtl/.DS_Store
 atac-qtl/Untitled.ipynb
 atac-qtl/pm_gend_nbs/*
 scrn-qtl/pm_gend_nbs/*
-
+scrn-qtl/.DS_Store
