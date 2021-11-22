@@ -127,3 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+rnab-qtl/Untitled.ipynb
+rnab-qtl/pm_gend_nbs/*
