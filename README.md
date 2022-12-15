@@ -29,3 +29,20 @@ Note: PDUI and RNAS are processed from the RNAB data so their info files are the
 2. Scale and covariate adjust each modality across days without adjusting for differentiation state (day effect) and split into individual day data before and after scaling and adjustment; quantifications/split_quants_by_day.ipynb. Each modality can be run using quantifications/pm_run_split_quants_by_day.ipynb
 3. Within each day scale and adjust each modalify within a specific day; quantifications/prep_quants_by_day.ipynb and quantifications/pm_run_prep_quants_by_day.ipynb
 
+### <i>cis</i>-QTL analysis of prepared modality
+1. Format the genotypes, current version of code was based on tensorQTL that required Plink bfile format, the newer version of tensorQTL may work with vcf but these analysis notebooks still expect bfiles. This only has to be performed once for all modalities and does not require removing unmatched modality samples, that is checked and performed in the <i>cis</i>-QTL notebook. The format genotypes notebook is genotypes/frmt_tensorqtl_genos.ipynb.
+2. Run the <i>cis</i>-QTL analysis for a modality and day. This notebook finalized prep of inputs to ensure matched samples between genotype, modality, and specified covariates. The notebook runs tensorQTL <i>cis</i> map_nominal, map_cis with empirical, and map_independent; analyses/cis_tensorqtl.ipynb. This notebook can be run for all iterations of day and modalities with Papermill; analyses/pm_run_cis_tensorqtl.ipynb
+3. Run the <i>cis</i>-interaction-QTL for the bulk modalities using the DA neuron fraction, NEEDS to be done
+
+### Post processing of <i>cis</i>-QTL results
+1. Compare <i>cis</i>-QTL between differentiation days for each modality; 
+2. Scan <i>cis</i>-QTL results for intersection with Parksinson's disease risk for each differentiation day and modality
+3. Colocalization analysis between Parksinson's disease risk and each differentiation day and modality <i>cis</i>-QTL results
+
+### Meta SCRN <i>cis</i>-eQTL analysis for FOUNDIN-PD (day 65) and Jerber et. al. HIPSCI (day 52) DA neuron single-cell <i>cis</i>-eQTL results
+1. Prepare summary-stats for inclusion in meta-analysis
+2. meta-analysis
+3. Colocalization analysis between Parksinson's disease risk and final differentiation day(s) DA neuron <i>cis</i>-QTL results
+
+
+
