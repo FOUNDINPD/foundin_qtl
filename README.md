@@ -39,6 +39,7 @@ Note: PDUI and RNAS are processed from the RNAB data so their info files are the
 2. Scan <i>cis</i>-QTL results for intersection with Parksinson's disease risk for each differentiation day and modality
 3. Colocalization analysis between Parksinson's disease risk and each differentiation day and modality <i>cis</i>-QTL results
 4. Visual colocalization results
+    - includes Bryois et al single-cell eQTL from cortex cell types
 
 ### Meta SCRN <i>cis</i>-eQTL analysis for FOUNDIN-PD (day 65) and Jerber et. al. HIPSCI (day 52) DA neuron single-cell <i>cis</i>-eQTL results
 1. Prepare summary-stats for inclusion in meta-analysis
