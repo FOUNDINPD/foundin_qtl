@@ -2,21 +2,14 @@
 FOUNDIN-PD multi-omics QTL analysis
 
 ## This project contains the per-omic quantitative trait loci (QTL) analyses
-- rnab-qtl: bulk RNAseq eQTL analysis
-    - includes interaction eQTL analysis for bulk RNA with [SCADEN](https://github.com/KevinMenden/scaden) estimated cell-type fractions
-    - includes quantitative trait score (QTS) analysis based on PD risk
-    - includes colocalization with common PD risk loci
-- atac-qtl: bulk ATACseq QTL (caQTL) analysis
-    - includes quantitative trait score (QTS) analysis based on PD risk
-    - includes colocalization with common PD risk loci
-- scrn-qtl: single-cell RNAseq eQTL analysis
-    - includes quantitative trait score (QTS) analysis based on PD risk
-    - includes colocalization with common PD risk loci
-- rnab3a-qtl: alternative polyadenylation (APA) quantative trait loci (3'aQTL) analysis from bulk RNAseq
-    - includes quantitative trait score (QTS) analysis based on PD risk
-    - includes colocalization with common PD risk loci
+- ATAC: caQTL for da0, da25, and da65
+- METH: mQTL for da0 and da65
+- RNAB: eQTL, 3'aQTL (PDUI) and circRNA eQTL (CIRC) for da0, da25, and da65 
+- RNAS: eQTL (for miRNA, piRNA, and tRNA) for da0, da25, and da65 
+- SCRN: eQTL for DA, ElC, eNP, iDA, lNP, NlC and PFPP cell-types and 3'aQTL (PDUI) for DA and iDA cell-types at da65
     
-## refactor to remove or reduce duplicate code between different omic QTL analyses
+## Note: This code was refactored and consolidated to remove or reduce duplicate code between different omic QTL analyses after completion and the FOUNDIN-PD resource paper and the current analyses for the FOUNDIN-PD QTL project. The resource paper code relative to this repo is tagged as v0.1.0-alpha.
+
 ### format modality sample info 
 this may have already be done as part of another analysis project
 1. combine known subject, sample, and modality covariates into single info table; quantifications/format_quants_covariates.ipynb
@@ -35,17 +28,16 @@ Note: PDUI and RNAS are processed from the RNAB data so their info files are the
 3. Run the <i>cis</i>-interaction-QTL for the bulk modalities using the DA neuron fraction, NEEDS to be done
 
 ### Post processing of <i>cis</i>-QTL results
-1. Compare <i>cis</i>-QTL between differentiation days for each modality; 
-2. Scan <i>cis</i>-QTL results for intersection with Parksinson's disease risk for each differentiation day and modality
-3. Colocalization analysis between Parksinson's disease risk and each differentiation day and modality <i>cis</i>-QTL results
-4. Visual colocalization results
-    - includes Bryois et al single-cell eQTL from cortex cell types
-    - includes the meta-eQTL results of DA neurons and (p)bulk RNA
+1. Compare <i>cis</i>-QTL between differentiation days for each modality; analyses/compare_day_qtl_results.ipynb. This notebook can be run for all modalities with multi-day data using Papermill; analyses/pm_run_compare_day_qtl.ipynb
+2. Scan <i>cis</i>-QTL results for intersection with Parksinson's disease risk for each differentiation day and modality; analyses/qtl_scan_risk.ipynb. This notebook can be run for all iterations of day and modalities with Papermill; analyses/pm_run_qtl_scan_risk.ipynb
+3. Colocalization analysis between Parksinson's disease risk and each differentiation day and modality <i>cis</i>-QTL results; analyses/colocalization.ipynb. This notebook can be run for all iterations of day and modalities with Papermill; analyses/pm_run_colocalization.ipynb
+4. Visual colocalization results; figures/colocalization_results_heatmap.ipynb
+    - includes Bryois et al single-cell eQTL from cortex cell types; analyses/coloc_bryois_brain_eqtl_results.ipynb
+    - includes the meta-eQTL results of DA neurons and (p)bulk RNA (see below)
 
 ### Meta SCRN <i>cis</i>-eQTL analysis for FOUNDIN-PD (day 65) and Jerber et. al. HIPSCI (day 52) DA neuron single-cell <i>cis</i>-eQTL results
-1. Prepare summary-stats for inclusion in meta-analysis
-2. meta-analysis
-3. Colocalization analysis between Parksinson's disease risk and final differentiation day(s) DA neuron <i>cis</i>-QTL results
+1. Prepare summary-stats for inclusion in meta-analysis and run; analyses/meta_qtl.ipynb
+2. Colocalization analysis between Parksinson's disease risk and final differentiation day(s) DA neuron <i>cis</i>-QTL results; analyses/coloc_meta_eqtl_results.ipynb
     - also meta-analysis of FOUNDIN-PD da65 RNAB and HipSci D52 pseudobulk eQTL results
 
 
