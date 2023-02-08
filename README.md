@@ -7,6 +7,8 @@ FOUNDIN-PD multi-omics QTL analysis
 - RNAB: eQTL, 3'aQTL (PDUI) and circRNA eQTL (CIRC) for da0, da25, and da65 
 - RNAS: eQTL (for miRNA, piRNA, and tRNA) for da0, da25, and da65 
 - SCRN: eQTL for DA, ElC, eNP, iDA, lNP, NlC and PFPP cell-types and 3'aQTL (PDUI) for DA and iDA cell-types at da65
+
+## This project also contains the per-omic quantitative trait score (QTS) analyses for each of the modality above as well
     
 ## Note: This code was refactored and consolidated to remove or reduce duplicate code between different omic QTL analyses after completion and the FOUNDIN-PD resource paper and the current analyses for the FOUNDIN-PD QTL project. The resource paper code relative to this repo is tagged as v0.1.0-alpha.
 
@@ -39,6 +41,12 @@ Note: PDUI and RNAS are processed from the RNAB data so their info files are the
 1. Prepare summary-stats for inclusion in meta-analysis and run; analyses/meta_qtl.ipynb
 2. Colocalization analysis between Parksinson's disease risk and final differentiation day(s) DA neuron <i>cis</i>-QTL results; analyses/coloc_meta_eqtl_results.ipynb
     - also meta-analysis of FOUNDIN-PD da65 RNAB and HipSci D52 pseudobulk eQTL results
+    
+### QTS analysis
+- Compute the genetic risk score for each of the FOUNDIN-PD cohort subjects based on the PD GWAS risk index variants or a subset of those variants that possible coloclize with DAn-meta eQTL results; genotypes/calculate_grs.ipynb
+- Perform the QTS analysis, linear regression between GRS and modalities quantified features; analyses/day_qts.ipynb. Run this for each differentiation day and modality with Papermill; analyses/pm_run_day_qts.ipynb
+- compare between days and modalities, none; analyses/compare_day_qts_results.ipynb
+- visual QTS for specific feature; figures/plot_qts_pair.ipynb
 
 
 
