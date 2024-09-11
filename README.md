@@ -12,17 +12,20 @@ FOUNDIN-PD multi-omics QTL analysis
     
 ## Note: This code was refactored and consolidated to remove or reduce duplicate code between different omic QTL analyses after completion and the FOUNDIN-PD resource paper and the current analyses for the FOUNDIN-PD QTL project. The resource paper code relative to this repo is tagged as v0.1.0-alpha.
 
-### format modality sample info 
-this may have already be done as part of another analysis project
-1. combine known subject, sample, and modality covariates into single info table; quantifications/format_quants_covariates.ipynb
-2. add data split column to the modality sample info table where the same test set subjects are used regardless of modality and day, test set based on batch 1 that was specifically balanced for the study, other samples are markered as training or exclude for known exclusions; analyses/format_data_splits_modeling.ipynb
-Note: PDUI and RNAS are processed from the RNAB data so their info files are the same at start
-
-### prepare the quantified modality
-1. Reformat modalities input files as neccessary so that each modality can use same/similar prep and analysis code.
-    - For PDUI reformat PDUI input from DaPar2 into quantified matrix and feature annotations, also correct the RNAB naming as needed; quantifications/dapar2_to_quant.ipynb
-2. Scale and covariate adjust each modality across days without adjusting for differentiation state (day effect) and split into individual day data before and after scaling and adjustment; quantifications/split_quants_by_day.ipynb. Each modality can be run using quantifications/pm_run_split_quants_by_day.ipynb
-3. Within each day scale and adjust each modalify within a specific day; quantifications/prep_quants_by_day.ipynb and quantifications/pm_run_prep_quants_by_day.ipynb
+### prepare the quantified modality; [quantifications/](https://raw.githubusercontent.com/FOUNDINPD/foundin_qtl/quantifications/main/README.md)
+1. combine known subject, sample, and modality covariates into single info table; format_quants_covariates.ipynb
+2. Reformat modalities input files as neccessary so that each modality can use same/similar prep and analysis code.
+    - ATAC use peaks_to_quant.ipynb
+    - RNAB use edgeR_cpm_to_quant.ipynb
+    - PDUI reformat PDUI input from DaPar2 into quantified matrix and feature annotations, also correct the RNAB naming as needed; dapar2_to_quant.ipynb
+    - RNAS use exceRpt_to_quant.ipynb
+    - CIRC use ciri2_to_quant.ipynb
+    - METH data already formated from different project
+    - SCRN data already formated from different project
+3. Split bulk modalities by day and single-cell modality by cell-type.
+    - Bulk data, scale and covariate adjust each modality across days without adjusting for differentiation state (day effect) and split into individual day data before and after scaling and adjustment; split_quants_by_day.ipynb. Each modality can be run using pm_run_split_quants_by_day.ipynb
+    - Single-cell use scrn_quants_by_celltype.ipynb
+4. Within each day and modality scale and adjust by covariates generated from variance within the modality and day; prep_quants_by_day.ipynb and pm_run_prep_quants_by_day.ipynb
 
 ### <i>cis</i>-QTL analysis of prepared modality
 1. Format the genotypes, current version of code was based on tensorQTL that required Plink bfile format, the newer version of tensorQTL may work with vcf but these analysis notebooks still expect bfiles. This only has to be performed once for all modalities and does not require removing unmatched modality samples, that is checked and performed in the <i>cis</i>-QTL notebook. The format genotypes notebook is genotypes/frmt_tensorqtl_genos.ipynb.
