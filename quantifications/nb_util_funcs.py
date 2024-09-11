@@ -4,17 +4,21 @@
 
 # imports
 from pandas import DataFrame , get_dummies
-from numpy import cumsum
+from numpy import cumsum, arange, where
 from sklearn.preprocessing import QuantileTransformer, MinMaxScaler
-from seaborn import distplot , scatterplot, heatmap
+from seaborn import distplot, scatterplot, heatmap
 from random import sample
 from umap import UMAP
 import ppscore as pps
 from sklearn.linear_model import LinearRegression
-from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA, FastICA, NMF
+from sklearn.metrics import r2_score, mean_squared_error
 from scipy.stats import zscore
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import rc_context
+from kneed import KneeLocator
+import pymde
+import torch
 
 # variables
 dpi_value = 100
@@ -67,8 +71,70 @@ def subset_well_detected_features(this_df, bad_call_rates):
     return this_wd_df
 
 """
-    functions to generate and visualize known and unknow covariates using PCA, UMAP and PPScore
+    functions to generate and visualize known and unknow covariates using PCA, NMF, ICA and PPScore
 """
+def iterate_model_component_counts(max_count: int, data_df: DataFrame, 
+                                   model_type: str=['PCA', 'NMF', 'ICA']) -> (list, list):
+    r2_rets = []
+    rmse_rets = []
+    for comp_num in arange(1, max_count+1):    
+        _,_,r2,rmse = generate_selected_model(comp_num, data_df, model_type)
+        r2_rets.append(r2)
+        rmse_rets.append(rmse)
+    return r2_rets, rmse_rets
+
+def generate_selected_model(n_comps: int, data_df: DataFrame,
+                            model_type: str=['PCA', 'NMF', 'ICA']) -> (object, DataFrame, float, float):
+    if model_type == 'PCA':
+        model = PCA(n_components=n_comps, random_state=42)
+    if model_type == 'NMF':
+        model = NMF(n_components=n_comps, init='random', random_state=42, max_iter=500)
+    if model_type == 'ICA':
+        model = FastICA(n_components=n_comps, random_state=42)        
+    components= model.fit_transform(data_df)
+    recon_input = model.inverse_transform(components)
+    r2 = r2_score(y_true=data_df, y_pred=recon_input)
+    rmse = mean_squared_error(data_df, recon_input, squared=False)
+    print(f'{model_type} with {n_comps} components accuracy is {r2:.4f}, RMSE is {rmse:.4f}')  
+    ret_df = DataFrame(data=components, index=data_df.index).round(4)
+    ret_df = ret_df.add_prefix(f'{model_type}_')
+    return model, ret_df, r2, rmse
+
+def component_from_max_curve(scores, label: str=['R2', 'RMSE', 'EVR']) -> int:
+    if label == 'R2' or label == 'EVR':
+        data_curve = 'concave'
+        data_direction = 'increasing'
+    if label == 'RMSE':
+        data_curve = 'convex'
+        data_direction = 'decreasing'        
+    knee = KneeLocator(arange(1, len(scores)+1), scores, 
+                       S=1.0, curve=data_curve, direction=data_direction)
+    if knee.knee is None:
+        num_comp = len(scores)
+    else:
+        num_comp = int(knee.knee) 
+    print(f'best curve at knee {num_comp}')
+    exp_value = scores[num_comp-1]
+    print(f'best number of components is {num_comp} at {label} of {exp_value}')
+    knee.plot_knee()
+    plt.show()
+    knee.plot_knee_normalized()
+    plt.show()
+    return num_comp
+
+def plot_pair(this_df: DataFrame, first: str, second: str, 
+              hue_cov=None, style_cov=None, size_cov=None):
+    with rc_context({'figure.figsize': (8, 8), 'figure.dpi': dpi_value}):
+        plt.style.use('seaborn-bright')
+        sns_plot = scatterplot(x=first,y=second, 
+                               hue=hue_cov, style=style_cov, size=size_cov, 
+                               data=this_df, palette='viridis')
+        plt.xlabel(first)
+        plt.ylabel(second)
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, 
+                   borderaxespad=0,prop={'size': 10})
+        plt.show() 
+    
 # function for plotting umap of traits with covar high lights
 def plot_umap_clusters(umap_df, hue_cov=None, style_cov=None, size_cov=None):
     with rc_context({'figure.figsize': (12, 12), 'figure.dpi': dpi_value}):
@@ -80,52 +146,28 @@ def plot_umap_clusters(umap_df, hue_cov=None, style_cov=None, size_cov=None):
         plt.ylabel('y-umap')
         plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0,prop={'size': 10})
         plt.show()
-
-def plot_pca_pair(this_df: DataFrame, first: str, second: str, 
-                  hue_cov=None, style_cov=None, size_cov=None):
-    with rc_context({'figure.figsize': (8, 8), 'figure.dpi': dpi_value}):
-        plt.style.use('seaborn-bright')
-        sns_plot = scatterplot(x=first,y=second, 
-                               hue=hue_cov, style=style_cov, size=size_cov, 
-                               data=this_df, palette='viridis')
-        plt.xlabel(first)
-        plt.ylabel(second)
-        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, 
-                   borderaxespad=0,prop={'size': 10})
-        plt.show()        
         
-# small function to generate umap from pandas dataframe, for all features (columns)
-# and return back as dataframe with source index intact
-def generate_umap_covs_df(this_df, other_covs_df=None, 
-                             rnd_digits=3, merge_input=False):
-    #run UMAP on the data frame features
-    umap_results = UMAP(random_state=42).fit_transform(this_df)
-    umap_df = DataFrame(umap_results,columns=['x_umap','y_umap'],
-                                       index=this_df.index).round(rnd_digits)
-    if merge_input:
-        umap_df = umap_df.merge(this_df,left_index=True,right_index=True)
-    if other_covs_df is not None:
-        umap_df = umap_df.merge(other_covs_df, how='left', 
-                                left_index=True, right_index=True)
-    print(f'The dimensions of the umap df and the traits are {umap_df.shape}')
-    return umap_df 
+# small function to generate 2D embed from pandas dataframe, for all features (columns)
+def generate_2d_embed_df(this_df, covs_df=None, embed_type: str='MDE', rnd_digits=3, merge_input=False):
+    ret_df = None
+    if embed_type == 'MDE':
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        print(device)
+        pymde.seed(42)
+        mde = pymde.preserve_neighbors(this_df.to_numpy(), device=device, verbose=True)
+        embedding = mde.embed(verbose=True)
+        embed_results = embedding.detach().cpu().numpy()
+    elif embed_type == 'UMAP':
+        embed_results = UMAP(random_state=42).fit_transform(this_df)
 
-def generate_pca(this_df: DataFrame, plot_variance: bool=False, 
-                 amount_var: float=0.99, rnd_digits: int=3) -> DataFrame:
-    pca = PCA(n_components=amount_var)
-    components = pca.fit_transform(this_df)
-    pca_df = DataFrame(data=components, index=this_df.index).round(rnd_digits)
-    pca_df = pca_df.add_prefix('PC_')
-    print(pca.explained_variance_ratio_)
-    print(len(pca.explained_variance_ratio_))    
-    if plot_variance:
-        with rc_context({'figure.figsize': (8, 8), 'figure.dpi': dpi_value}):
-            plt.style.use('seaborn-bright')
-            plt.plot(cumsum(pca.explained_variance_ratio_))
-            plt.xlabel('Number of components')
-            plt.ylabel('Explained variance')
-            plt.show()
-    return pca_df
+    ret_df = DataFrame(embed_results, columns=['LD_1','LD_2'], 
+                       index=this_df.index).round(rnd_digits)
+    if merge_input:
+        ret_df = ret_df.merge(this_df,left_index=True, right_index=True)
+    if covs_df is not None:
+        ret_df = ret_df.merge(covs_df, how='left', left_index=True, right_index=True)
+    print(f'The dimensions of the embed df and the covariates are {ret_df.shape}')
+    return ret_df
 
 # function to iterate over target features and use PPScore to find covarites of interest
 def pps_predict_targets(this_df, target_list, min_ppscore: float=0.05):
@@ -144,7 +186,7 @@ def pps_predict_targets(this_df, target_list, min_ppscore: float=0.05):
 
 # plot ppscore matrix 
 def plot_ppscore_matrix(this_df, covs_to_check, cov_targets, min_ppscore: float=0.05):
-    matrix_df = pps.matrix(this_df[(set(covs_to_check) | set(cov_targets))])
+    matrix_df = pps.matrix(this_df[list(set(covs_to_check) | set(cov_targets))])
     matrix_df = matrix_df.loc[matrix_df['ppscore'] > min_ppscore]
     print(matrix_df.shape)
 
@@ -161,21 +203,15 @@ def plot_ppscore_matrix(this_df, covs_to_check, cov_targets, min_ppscore: float=
         plt.show()
     
 # plot heatmap of Pearson correlation matrix for PPScore covariates
-def plot_correlation_heatmap(this_df, covs_list : list=None, min_pearson: float=0.22):
+def plot_correlation_heatmap(this_df, min_pearson: float=0.22):
     cor = this_df.corr(method='pearson')
     cor.dropna(how='all', inplace=True)
     modified_title = ''
-    if covs_list is not None:
-        
-        limited_cor = cor[covs_list]
-        cor = limited_cor.loc[(limited_cor['x_umap'].abs() > min_pearson) | 
-                              (limited_cor['y_umap'].abs() > min_pearson)]
-        modified_title = 'limited'
     print(cor.shape)
     fig_width = cor.shape[1] if cor.shape[1] > 12 else 12
     fig_height = cor.shape[0] if cor.shape[1] > 12 else 12
-    with rc_context({'figure.figsize': (fig_width, fig_height), 'figure.dpi': dpi_value}):
-        plt.style.use('seaborn-bright')       
+    with rc_context({'figure.figsize': (fig_width, fig_height), 'figure.dpi': 100}):
+        plt.style.use('seaborn-bright')    
         heatmap(cor[(cor > min_pearson) | (cor < -min_pearson)], annot=True, 
                 annot_kws={"fontsize":10}, linewidths=0.05, cmap='Blues')    
         plt.title(f'Pearson heatmap of PPScore covariates {modified_title}')
@@ -186,10 +222,11 @@ def dummy_covs_as_needed(this_df):
     temp_df = this_df.copy()
     cats_df = temp_df.select_dtypes(include=['object'])
     print(f'categoricals shape {cats_df.shape}')
-    dums_df = get_dummies(cats_df)
+    dums_df = get_dummies(cats_df).astype(int)
     print(f'one-hot encoded categoricals shape {dums_df.shape}')
-
-    temp_df = temp_df.merge(dums_df, how='inner', left_index=True, right_index=True)
+    temp_df = temp_df.drop(columns=cats_df.columns)
+    temp_df = temp_df.merge(dums_df, how='inner', left_index=True, 
+                            right_index=True)
     print(f'new covs df shape {temp_df.shape}')
     return temp_df
 
@@ -221,9 +258,12 @@ def plot_trnsfrm_effect_example(before_df, after_df, feature_id=None,
     analysis functions
 """        
 # small function to perform the quantile transform and minmax scale on a pandas dataframe
-def scale_dataframe(this_df : DataFrame):
-    scaledX = MinMaxScaler().fit_transform(QuantileTransformer(output_distribution='normal')
-                                           .fit_transform(this_df))
+def scale_dataframe(this_df : DataFrame, with_qt: bool=True):
+    if with_qt:
+        scaledX = MinMaxScaler().fit_transform(QuantileTransformer(output_distribution='normal')
+                                               .fit_transform(this_df))
+    else:
+        scaledX = MinMaxScaler().fit_transform(this_df)    
     scaled_df = DataFrame(data=scaledX, columns=this_df.columns, 
                                  index=this_df.index)  
     return scaled_df    
@@ -241,7 +281,7 @@ def exclude_low_var_features(this_df: DataFrame, quartile_to_drop: str ='25%',
         keep_ids = set(keep.index) - set(known_feature_to_drop)
     else:
         keep_ids = set(keep.index)
-    quants_wd_var_df = this_df[keep_ids]
+    quants_wd_var_df = this_df[list(keep_ids)]
     print(f'shape of the features to keep {keep.shape}')
     print(f'shape of input features df {this_df.shape}')
     print(f'shape of variance features df {quants_wd_var_df.shape}')
@@ -280,4 +320,55 @@ def write_df_to_parquet(this_df, file_name):
     
 # small function to save hdf file
 def write_df_to_hdf(this_df, file_name, key='quants', mode='w'):
-    this_df.to_hdf(file_name, key=key, mode=mode) 
+    this_df.to_hdf(file_name, key=key, mode=mode)
+
+# format dataframes to tensorQTL pheno bed files
+def format_tensorqtl_bed(data_df: DataFrame, features_df: DataFrame, out_file: str, 
+                         modality: str, id_map: DataFrame):
+    # get feature annots for present features
+    feature_present_df = features_df.loc[features_df['feature'].isin(data_df.columns)]
+    print(f'features present shape {feature_present_df.shape}')
+    # tensorQTL pheno bed is rows = features and columns = samples
+    # where first four columns are chr, start, end, phenotype_id, then sample1 ... sampleN
+
+    # create dict for renaming columns (samples) from assayid to geno_id
+    sample_col_dict = id_map.set_index('assayid').to_dict()['sampleid']
+    
+    # transpose the data df from sample x feature to feature x sample
+    tdata_df = data_df.transpose()
+    
+    # modify annots
+    if modality == 'METH':
+        feature_present_df = feature_present_df.rename(columns={'Chr': 'chr'})
+    else:
+        feature_present_df = feature_present_df.rename(columns={'chrom': 'chr'})
+    feature_present_df['end'] = feature_present_df['start'] + 1
+    print(f'features present shape {feature_present_df.shape}')
+    feature_present_df = feature_present_df.drop_duplicates(subset=['feature'], 
+                                                            keep='first', 
+                                                            ignore_index=True)
+    feature_present_df = feature_present_df.set_index('feature', drop=False)
+    feature_present_df = feature_present_df.reindex(tdata_df.index)
+    
+    # insert the feature annots
+    tdata_df.insert( 0, column='chr', value=feature_present_df['chr'])
+    tdata_df.insert( 1, column='start', value=feature_present_df['start'])
+    tdata_df.insert( 2, column='end', value=feature_present_df['end'])
+    tdata_df.insert( 3, column='phenotype_id', value=feature_present_df['feature'])
+    
+    # if there are any genes that were in quants but not feature annots
+    # remove these with missing positions
+    tdata_df = tdata_df.loc[~tdata_df['chr'].isna()]
+    # make the positions ints instead of floats
+    tdata_df['start'] = tdata_df['start'].astype('int64')
+    tdata_df['end'] = tdata_df['end'].astype('int64')
+
+    # now rename sample ids in columns
+    tdata_df = tdata_df.rename(columns=sample_col_dict)
+    
+    # tensorQTL pheno reader expects sorted bed
+    tdata_df = tdata_df.sort_values(['chr', 'start', 'end'])
+    
+    # save the file
+    tdata_df.to_csv(out_file, index=False, sep='\t', compression='gzip')
+    print(f'tdata_df shape is {tdata_df.shape}')
