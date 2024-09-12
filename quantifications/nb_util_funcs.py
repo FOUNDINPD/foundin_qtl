@@ -134,18 +134,6 @@ def plot_pair(this_df: DataFrame, first: str, second: str,
         plt.legend(bbox_to_anchor=(1.05, 1), loc=2, 
                    borderaxespad=0,prop={'size': 10})
         plt.show() 
-    
-# function for plotting umap of traits with covar high lights
-def plot_umap_clusters(umap_df, hue_cov=None, style_cov=None, size_cov=None):
-    with rc_context({'figure.figsize': (12, 12), 'figure.dpi': dpi_value}):
-        plt.style.use('seaborn-bright')
-        sns_plot = scatterplot(x='x_umap',y='y_umap',
-                               hue=hue_cov, style=style_cov, size=size_cov,
-                               data=umap_df)
-        plt.xlabel('x-umap')
-        plt.ylabel('y-umap')
-        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0,prop={'size': 10})
-        plt.show()
         
 # small function to generate 2D embed from pandas dataframe, for all features (columns)
 def generate_2d_embed_df(this_df, covs_df=None, embed_type: str='MDE', rnd_digits=3, merge_input=False):
@@ -172,7 +160,6 @@ def generate_2d_embed_df(this_df, covs_df=None, embed_type: str='MDE', rnd_digit
 # function to iterate over target features and use PPScore to find covarites of interest
 def pps_predict_targets(this_df, target_list, min_ppscore: float=0.05):
     covs_to_check = []
-#     covs_list = ['x_umap', 'y_umap']
     for this_cov in target_list:
         print(this_cov)
         predictors_df = pps.predictors(this_df, this_cov)
