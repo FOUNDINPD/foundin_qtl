@@ -148,7 +148,7 @@ def generate_2d_embed_df(this_df, covs_df=None, embed_type: str='MDE', rnd_digit
     elif embed_type == 'UMAP':
         embed_results = UMAP(random_state=42).fit_transform(this_df)
 
-    ret_df = DataFrame(embed_results, columns=['LD_1','LD_2'], 
+    ret_df = DataFrame(embed_results, columns=[f'{embed_type}_1',f'{embed_type}_2'],
                        index=this_df.index).round(rnd_digits)
     if merge_input:
         ret_df = ret_df.merge(this_df,left_index=True, right_index=True)
@@ -156,6 +156,16 @@ def generate_2d_embed_df(this_df, covs_df=None, embed_type: str='MDE', rnd_digit
         ret_df = ret_df.merge(covs_df, how='left', left_index=True, right_index=True)
     print(f'The dimensions of the embed df and the covariates are {ret_df.shape}')
     return ret_df
+
+def show_2d_embed(data_df: DataFrame, cov_df: DataFrame, type: str='MDE',
+                  hue: str=None, style: str=None, size: str=None, 
+                  verbose: bool=False):
+    embd_df = generate_2d_embed_df(data_df, cov_df, embed_type=type)
+    print(f'embd_df shape is {embd_df.shape}')
+    if verbose:
+        display(embd_df.head())
+    plot_pair(embd_df, f'{type}_1', f'{type}_2', 
+              hue_cov=hue, style_cov=style, size_cov=size) 
 
 # function to iterate over target features and use PPScore to find covarites of interest
 def pps_predict_targets(this_df, target_list, min_ppscore: float=0.05):
