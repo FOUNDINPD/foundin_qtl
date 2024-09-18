@@ -335,10 +335,7 @@ def format_tensorqtl_bed(data_df: DataFrame, features_df: DataFrame, out_file: s
     tdata_df = data_df.transpose()
     
     # modify annots
-    if modality == 'METH':
-        feature_present_df = feature_present_df.rename(columns={'Chr': 'chr'})
-    else:
-        feature_present_df = feature_present_df.rename(columns={'chrom': 'chr'})
+    feature_present_df = feature_present_df.rename(columns={'chrom': 'chr'})
     feature_present_df['end'] = feature_present_df['start'] + 1
     print(f'features present shape {feature_present_df.shape}')
     feature_present_df = feature_present_df.drop_duplicates(subset=['feature'], 
