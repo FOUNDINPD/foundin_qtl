@@ -12,3 +12,7 @@
     - Bulk data, scale and covariate adjust each modality across days without adjusting for differentiation state (day effect) and split into individual day data before and after scaling and adjustment; split_quants_by_day.ipynb. Each modality can be run using pm_run_split_quants_by_day.ipynb
     - Single-cell use scrn_quants_by_celltype.ipynb
 4. Within each day and modality scale and adjust by covariates generated from variance within the modality and day; prep_quants_by_day.ipynb and pm_run_prep_quants_by_day.ipynb
+
+
+## other
+peak_risk_intersect.ipynb
