@@ -8,11 +8,7 @@
 - Prepare summary-stats for inclusion in meta-analysis and run; analyses/meta_qtl.ipynb
 
 
-
 # Colocalization of <i>cis</i>-QTL with common Parkinson's disease risk.
-Using risk summary statistics from Nalls et al for PD (including 23andMe)
-1. Compute LD statictics between risk index variant and other variants on the sample chromosome using AMP-PD WGS TOPMed freeze9 genotype calls as a reference panel. ld_risk_index_variant.ipynb
-2. Identify ATAC peaks present in da65 bulk ATAC and the SCAT DA neuron cell-type that contain possible risk variants associated with PD. peak_risk_intersect.ipynb
 1. Scan <i>cis</i>-QTL results for intersection with Parksinson's disease risk for each differentiation day and modality results; analyses/qtl_scan_risk.ipynb. This notebook can be run for all iterations of day and modalities with Papermill; analyses/pm_run_qtl_scan_risk.ipynb
 2. Colocalization analysis between Parksinson's disease risk and each differentiation day and modality <i>cis</i>-QTL results including the meta-DAn eQTL results; analyses/colocalization.ipynb. This notebook can be run for all iterations of day and modalities with Papermill; analyses/pm_run_colocalization.ipynb
 3. 
@@ -24,9 +20,11 @@ Using risk summary statistics from Nalls et al for PD (including 23andMe)
     - also meta-analysis of FOUNDIN-PD da65 RNAB and HipSci D52 pseudobulk eQTL results
   
 # <i>cis</i> proximal correlations between ATAC peaks and gene expression; Gene ~ ATAC, Gene ~ DNA methylation
-1. Run the linear regressions between genes and their <i>cis</i> proximal ATAC peaks and genes and there <i>cis</i> proximal DNA methylation CpG sites. Here also using tensorQTL where ATAC peak features or CpG sites are the exogenious variable instead of variant genotype. cis_correlation.ipynb and cis_correlation_runner.ipynb
+1. Run the linear regressions between modality features and their <i>cis</i> proximal ATAC peaks and there <i>cis</i> proximal DNA methylation CpG sites. Here also using tensorQTL where ATAC peak features or CpG sites are the exogenious variable instead of variant genotype. cis_correlation.ipynb and cis_correlation_runner.ipynb
 2. Compare results between cell-types. compare_celltype_ciscorr_results.ipynb
 3. Identify <i>cis</i> ATAC peaks that correlated with each other by cell-type using Cicero. Monocle3_Cicero.ipynb
+4. Compute LD statictics between risk index variant and other variants on the sample chromosome using AMP-PD WGS TOPMed freeze9 genotype calls as a reference panel. ld_risk_index_variant.ipynb
+5. Identify ATAC peaks present in da65 bulk ATAC and the SCAT DA neuron cell-type that contain possible risk variants associated with PD. peak_risk_intersect.ipynb
     
 # QTS analysis
 - Compute the genetic risk score for each of the FOUNDIN-PD cohort subjects based on the PD GWAS risk index variants or a subset of those variants that possible coloclize with DAn-meta eQTL results; genotypes/calculate_grs.ipynb
