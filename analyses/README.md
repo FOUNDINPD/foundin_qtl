@@ -3,31 +3,35 @@
 2. Run the <i>cis</i>-QTL analysis for a modality and day. This notebook finalized prep of inputs to ensure matched samples between genotype, modality, and specified covariates. The notebook runs tensorQTL <i>cis</i> map_nominal and map_cis with empirical; analyses/cis_tensorqtl.ipynb. This notebook can be run for all iterations of day and modalities with Papermill; analyses/pm_run_cis_tensorqtl.ipynb
 3. Run the <i>cis</i>-interaction-QTL for the bulk modalities using the DA neuron fraction, NEEDS to be done
 4. Compare <i>cis</i>-QTL between differentiation days for each modality; analyses/compare_day_qtl_results.ipynb. This notebook can be run for all modalities with multi-day data using Papermill; analyses/pm_run_compare_day_qtl.ipynb
+5. For the single-cell eQTL compare eQTL between cell-types; analyses/compare_cell_qtl_results.ipynb
 
 # Meta SCRN <i>cis</i>-eQTL analysis for FOUNDIN-PD (day 65) and Jerber et. al. HIPSCI (day 52) DA neuron single-cell <i>cis</i>-eQTL results
-- Prepare summary-stats for inclusion in meta-analysis and run; analyses/meta_qtl.ipynb
+- Prepare summary-stats for inclusion in meta-analysis and run meta-DAn eQTL; analyses/meta_qtl.ipynb
 
 
 # Colocalization of <i>cis</i>-QTL with common Parkinson's disease risk.
+1. Format the meta-GWAS PD summary stats for colocaliation analysis; analyses/format_pd_sumstats.ipynb
 1. Scan <i>cis</i>-QTL results for intersection with Parksinson's disease risk for each differentiation day and modality results; analyses/qtl_scan_risk.ipynb. This notebook can be run for all iterations of day and modalities with Papermill; analyses/pm_run_qtl_scan_risk.ipynb
-2. Colocalization analysis between Parksinson's disease risk and each differentiation day and modality <i>cis</i>-QTL results including the meta-DAn eQTL results; analyses/colocalization.ipynb. This notebook can be run for all iterations of day and modalities with Papermill; analyses/pm_run_colocalization.ipynb
-3. 
-4. Visual colocalization results; figures/colocalization_results_heatmap.ipynb
-    - includes Bryois et al single-cell eQTL from cortex cell types; analyses/coloc_bryois_brain_eqtl_results.ipynb
-    - includes the meta-eQTL results of DA neurons and (p)bulk RNA (see below)
-
-2. Colocalization analysis between Parksinson's disease risk and final differentiation day(s) DA neuron <i>cis</i>-QTL results; analyses/coloc_meta_eqtl_results.ipynb
-    - also meta-analysis of FOUNDIN-PD da65 RNAB and HipSci D52 pseudobulk eQTL results
+2. Colocalization analysis between Parksinson's disease risk and each differentiation day and modality <i>cis</i>-QTL results where modalities include single-cell eQTL results as well; analyses/colocalization.ipynb. This notebook can be run for all iterations of day and modalities with Papermill; analyses/pm_run_colocalization.ipynb
+3. Colocalization analysis between Parksinson's disease risk and meta-DAn eQTL; analyses/coloc_meta_eqtl_results.ipynb
+4. Colocalization analysis between Parksinson's disease risk and public eQTL:
+    - Bryois et al single-cell eQTL; analyses/coloc_bryois_brain_eqtl_results.ipynb
+    - Jerber et al HiPSCI differentiated DAn eQTL; analyses/coloc_hipsci_dan_eqtl_results.ipynb
+    - de Klein et al Metabrain bulk brain region eQTL; analyses/coloc_metabrain_eqtl_results.ipynb
   
-# <i>cis</i> proximal correlations between ATAC peaks and gene expression; Gene ~ ATAC, Gene ~ DNA methylation
-1. Run the linear regressions between modality features and their <i>cis</i> proximal ATAC peaks and there <i>cis</i> proximal DNA methylation CpG sites. Here also using tensorQTL where ATAC peak features or CpG sites are the exogenious variable instead of variant genotype. cis_correlation.ipynb and cis_correlation_runner.ipynb
-2. Compare results between cell-types. compare_celltype_ciscorr_results.ipynb
-3. Identify <i>cis</i> ATAC peaks that correlated with each other by cell-type using Cicero. Monocle3_Cicero.ipynb
+# <i>cis</i> proximal correlations between bulk modalities, such as Gene ~ ATAC, Gene ~ DNA methylation
+1. Run the linear regressions between modality features and their <i>cis</i> proximal features from the other bulk modalities. Here also using tensorQTL where other modalities are the exogenious variable instead of variant genotype. cis_correlation.ipynb and pm_run_cis_correlation.ipynb
+2. Compare results between differentiation days. compare_day_ciscorr_results.ipynb and pm_run_compare_days_ciscorr.ipynb
 4. Compute LD statictics between risk index variant and other variants on the sample chromosome using AMP-PD WGS TOPMed freeze9 genotype calls as a reference panel. ld_risk_index_variant.ipynb
 5. Identify ATAC peaks present in da65 bulk ATAC and the SCAT DA neuron cell-type that contain possible risk variants associated with PD. peak_risk_intersect.ipynb
-    
+6. Find the modality features that have a corellated <i>cis</i> proximal ATAC peak(s) where the peaks contain possible PD risk variants; ciscorr_scan_risk.ipynb and pm_run_ciscorr_scan_risk.ipynb
+
+
 # QTS analysis
 - Compute the genetic risk score for each of the FOUNDIN-PD cohort subjects based on the PD GWAS risk index variants or a subset of those variants that possible coloclize with DAn-meta eQTL results; genotypes/calculate_grs.ipynb
 - Perform the QTS analysis, linear regression between GRS and modalities quantified features; analyses/day_qts.ipynb. Run this for each differentiation day and modality with Papermill; analyses/pm_run_day_qts.ipynb
 - compare between days and modalities, none; analyses/compare_day_qts_results.ipynb
-- visual QTS for specific feature; figures/plot_qts_pair.ipynb
+
+# Other analyses
+- Features associated with differentiation day or estimated cell-type fraction. Run mixed effects model for each modality with subject as the random factor using samples from all timepoints the modality features and endogenous term and day or estimated DAn fraction as the exogenous term; mixed_effects_analysis_feature.ipynb and pm_run_mixed_effects.ipynb
+- Similarly for known monogenic genes run mixed effects model where measures of cell-type differentiation are the endogenous term and the monogenic genes are exogenous terms; cell_fracs_corr_cis_monogenics.ipynb and pm_run_cell_fracs_cis_monogenics.ipynb
