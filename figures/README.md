@@ -1,6 +1,20 @@
-6. Visual colocalization results; figures/colocalization_results_heatmap.ipynb
-    - includes Bryois et al single-cell eQTL from cortex cell types; analyses/coloc_bryois_brain_eqtl_results.ipynb
-    - includes the meta-eQTL results of DA neurons and (p)bulk RNA (see below)
-  
+# Notebooks for generation of draft figures and visualizaitons
 
-- visual QTS for specific feature; figures/plot_qts_pair.ipynb
+## Compare FOUNDIN-PD da65 SCRN-DA to HipSci day 52 SCRN-DA eQTL and FOUNID RNAB to HipSci SCRN pseudo bulk; figures/compare_foundin_hipsci.ipynb
+
+## Visualization of PD risk and QTL colocalization results as a heatmap; figures/colocalization_results_heatmap.ipynb
+
+## Plot feature specific QTL and PD risk results; figures/feature_specific_qtl_results.ipynb and figures/pm_run_feature_specific_qtl_results.ipynb
+
+## Visualize cell-type importance based on colocalziation between PD risk and cell-specific eQTL; figures/cell_enrichment_risk_qtl_colocaliation.ipynb
+  
+## Generate the GSEA Enrichr results for the specified colocalizations results and enrichment libraries; figures/gsea_enrichr.ipynb
+
+
+
+
+figures/cell_pathway_sankey.ipynb is dependent on gsea stuff
+
+## visual QTS for specific feature; figures/plot_qts_pair.ipynb
+
+## Compare cell-type fractions from single-cell modalities and the SCADEN estimated cell-type fractions for the RNAB; figures/compare_cell_fractions.ipynb
