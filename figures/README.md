@@ -17,7 +17,7 @@
 
 figures/cell_pathway_sankey.ipynb is dependent on gsea stuff
 
-## visual QTS for specific feature; figures/plot_qts_pair.ipynb
+## Visualize a specific QTS pairing between PD GRS and modality feature; figures/plot_qts_pair.ipynb
 
 ## Compare cell-type fractions from single-cell modalities and the SCADEN estimated cell-type fractions for the RNAB; figures/compare_cell_fractions.ipynb
 
