@@ -12,7 +12,7 @@
   
 ## Generate the GSEA Enrichr results for the specified colocalizations results and enrichment libraries; figures/gsea_enrichr.ipynb
 
-
+## Plot feature quantification by genotype allele for a QTL; figures/plot_qtl_genotype.ipynb and figures/pm_run_plot_qtl_geno.ipynb
 
 
 figures/cell_pathway_sankey.ipynb is dependent on gsea stuff
