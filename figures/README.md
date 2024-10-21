@@ -10,12 +10,11 @@
 
 ## Visualize cell-type importance based on colocalziation between PD risk and cell-specific eQTL; figures/cell_enrichment_risk_qtl_colocaliation.ipynb
   
-## Generate the GSEA Enrichr results for the specified colocalizations results and enrichment libraries; figures/gsea_enrichr.ipynb
-
 ## Plot feature quantification by genotype allele for a QTL; figures/plot_qtl_genotype.ipynb and figures/pm_run_plot_qtl_geno.ipynb
 
+## Generate the GSEA Enrichr results for the specified colocalizations results and enrichment libraries; figures/gsea_enrichr.ipynb
 
-figures/cell_pathway_sankey.ipynb is dependent on gsea stuff
+## Visual GSEA results and cell-types for colocalized genes as Sankey diagram; figures/cell_pathway_sankey.ipynb is dependent on gsea stuff
 
 ## Visualize a specific QTS pairing between PD GRS and modality feature; figures/plot_qts_pair.ipynb
 
